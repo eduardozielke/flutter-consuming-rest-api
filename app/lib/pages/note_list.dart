@@ -1,38 +1,39 @@
+import 'package:app/models/api_response.dart';
 import 'package:app/models/note.dart';
 import 'package:app/pages/note_delete.dart';
 import 'package:app/pages/note_modify.dart';
+import 'package:app/services/notes_service.dart';
 import 'package:app/utils/format_date_and_time.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
-class NoteList extends StatelessWidget {
-  NoteList({Key? key}) : super(key: key);
+class NoteList extends StatefulWidget {
+  const NoteList({Key? key}) : super(key: key);
 
-  final List<Note> notes = [
-    Note(
-      noteID: '1',
-      createDateTime: DateTime.now(),
-      lastestEditDateTime: DateTime.now(),
-      noteTitle: 'Note 1',
-    ),
-    Note(
-      noteID: '2',
-      createDateTime: DateTime.now(),
-      lastestEditDateTime: DateTime.now(),
-      noteTitle: 'Note 2',
-    ),
-    Note(
-      noteID: '3',
-      createDateTime: DateTime.now(),
-      lastestEditDateTime: DateTime.now(),
-      noteTitle: 'Note 3',
-    ),
-    Note(
-      noteID: '4',
-      createDateTime: DateTime.now(),
-      lastestEditDateTime: DateTime.now(),
-      noteTitle: 'Note 4',
-    ),
-  ];
+  @override
+  State<NoteList> createState() => _NoteListState();
+}
+
+class _NoteListState extends State<NoteList> {
+  NotesService get service => GetIt.instance<NotesService>();
+  late APIResponse<List<Note>> _apiResponse;
+  bool _isLoading = false;
+
+  List<Note> notes = [];
+
+  @override
+  void initState() {
+    _fetchNotes();
+    super.initState();
+  }
+
+  _fetchNotes() async {
+    setState(() => _isLoading = true);
+
+    _apiResponse = await service.getNotesList();
+
+    setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,43 +49,55 @@ class NoteList extends StatelessWidget {
         }),
         child: const Icon(Icons.add),
       ),
-      body: ListView.builder(
-        itemCount: notes.length,
-        itemBuilder: (__, index) {
-          return Dismissible(
-            key: ValueKey(notes[index].noteID),
-            direction: DismissDirection.startToEnd,
-            background: Container(
-              color: Colors.red,
-              padding: const EdgeInsets.only(left: 16),
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Icon(Icons.delete, color: Colors.white),
-              ),
-            ),
-            onDismissed: (direction) {},
-            confirmDismiss: (direction) async {
-              final result = await showDialog(
-                context: context,
-                builder: (_) => const NoteDelete(),
-              );
-              return result;
-            },
-            child: Card(
-              child: ListTile(
-                title: Text(notes[index].noteTitle),
-                subtitle: Text(
-                  'Last edited on ${formatDateAndTime(notes[index].lastestEditDateTime!)}',
+      body: Builder(
+        builder: (_) {
+          if (_isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (_apiResponse.error) {
+            return Center(child: Text(_apiResponse.errorMessage));
+          }
+
+          return ListView.builder(
+            itemCount: _apiResponse.data!.length,
+            itemBuilder: (__, index) {
+              return Dismissible(
+                key: ValueKey(_apiResponse.data![index].noteID),
+                direction: DismissDirection.startToEnd,
+                background: Container(
+                  color: Colors.red,
+                  padding: const EdgeInsets.only(left: 16),
+                  child: const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
                 ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const NoteModify(noteID: '1'),
-                    ),
+                onDismissed: (direction) {},
+                confirmDismiss: (direction) async {
+                  final result = await showDialog(
+                    context: context,
+                    builder: (_) => const NoteDelete(),
                   );
+                  return result;
                 },
-              ),
-            ),
+                child: Card(
+                  child: ListTile(
+                    title: Text(_apiResponse.data![index].noteTitle),
+                    subtitle: Text(
+                      'Last edited on ${formatDateAndTime(_apiResponse.data![index].getDate!)}',
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const NoteModify(noteID: '1'),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
