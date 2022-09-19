@@ -10,13 +10,13 @@ class NoteDelete extends StatelessWidget {
       title: const Text('Warning'),
       content: const Text('Are you sure you want to delete this note?'),
       actions: <Widget>[
-        TextButton(
+        CupertinoDialogAction(
           child: const Text('No'),
           onPressed: () {
             Navigator.of(context).pop(false);
           },
         ),
-        TextButton(
+        CupertinoDialogAction(
           child: const Text('Yes'),
           onPressed: () {
             Navigator.of(context).pop(true);

@@ -4,6 +4,7 @@ import 'package:app/pages/note_delete.dart';
 import 'package:app/pages/note_modify.dart';
 import 'package:app/services/notes_service.dart';
 import 'package:app/utils/format_date_and_time.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -38,7 +39,7 @@ class _NoteListState extends State<NoteList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('List of notes')),
+      appBar: const CupertinoNavigationBar(middle: Text('List of notes')),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
           Navigator.of(context)
@@ -50,7 +51,7 @@ class _NoteListState extends State<NoteList> {
       body: Builder(
         builder: (_) {
           if (_isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CupertinoActivityIndicator(radius: 17));
           }
 
           if (_apiResponse.error) {

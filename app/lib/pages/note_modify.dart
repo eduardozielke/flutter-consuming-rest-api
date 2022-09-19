@@ -47,14 +47,16 @@ class _NoteModifyState extends State<NoteModify> {
     titleController.text = note.noteTitle;
     contentController.text = note.noteContent;
 
-    setState(() => isLoading = false);
+    if (mounted) {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Edit note' : 'Create note'),
+      appBar: CupertinoNavigationBar(
+        middle: Text(isEditing ? 'Edit note' : 'Create note'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -62,20 +64,21 @@ class _NoteModifyState extends State<NoteModify> {
           visible: isLoading,
           replacement: Column(
             children: <Widget>[
-              TextField(
+              CupertinoTextField(
+                autofocus: true,
                 controller: titleController,
-                decoration: const InputDecoration(hintText: 'Notes title'),
+                placeholder: 'Note title',
               ),
               const SizedBox(height: 15),
-              TextField(
+              CupertinoTextField(
                 controller: contentController,
-                decoration: const InputDecoration(hintText: 'Notes content'),
+                placeholder: 'Note content',
               ),
               const SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
-                height: 35,
-                child: ElevatedButton(
+                height: 45,
+                child: CupertinoButton.filled(
                   onPressed: () async {
                     setState(() => isLoading = true);
 
@@ -99,7 +102,7 @@ class _NoteModifyState extends State<NoteModify> {
                           title: const Text('Done'),
                           content: Text(text),
                           actions: <Widget>[
-                            TextButton(
+                            CupertinoDialogAction(
                               child: const Text('Ok'),
                               onPressed: () {
                                 Navigator.of(context).pop();
@@ -116,7 +119,7 @@ class _NoteModifyState extends State<NoteModify> {
                       final result = await NotesService().createNote(note);
                       final text = result.error
                           ? result.errorMessage
-                          : 'Your note was createad';
+                          : 'Your note was created';
 
                       setState(() => isLoading = false);
 
@@ -126,7 +129,7 @@ class _NoteModifyState extends State<NoteModify> {
                           title: const Text('Done'),
                           content: Text(text),
                           actions: <Widget>[
-                            TextButton(
+                            CupertinoDialogAction(
                               child: const Text('Ok'),
                               onPressed: () {
                                 Navigator.of(context).pop();
@@ -147,7 +150,7 @@ class _NoteModifyState extends State<NoteModify> {
               )
             ],
           ),
-          child: const Center(child: CircularProgressIndicator()),
+          child: const Center(child: CupertinoActivityIndicator(radius: 17)),
         ),
       ),
     );
