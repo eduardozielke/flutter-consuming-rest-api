@@ -1,5 +1,5 @@
 import 'package:app/models/api_response.dart';
-import 'package:app/models/note.dart';
+import 'package:app/models/notes.dart';
 import 'package:app/pages/note_delete.dart';
 import 'package:app/pages/note_modify.dart';
 import 'package:app/services/notes_service.dart';
@@ -16,10 +16,10 @@ class NoteList extends StatefulWidget {
 
 class _NoteListState extends State<NoteList> {
   NotesService get service => GetIt.instance<NotesService>();
-  late APIResponse<List<Note>> _apiResponse;
+  late APIResponse<List<Notes>> _apiResponse;
   bool _isLoading = false;
 
-  List<Note> notes = [];
+  List<Notes> notes = [];
 
   @override
   void initState() {
@@ -41,11 +41,9 @@ class _NoteListState extends State<NoteList> {
       appBar: AppBar(title: const Text('List of notes')),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const NoteModify(),
-            ),
-          );
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => const NoteModify()))
+              .then((_) => _fetchNotes());
         }),
         child: const Icon(Icons.add),
       ),
@@ -63,7 +61,7 @@ class _NoteListState extends State<NoteList> {
             itemCount: _apiResponse.data!.length,
             itemBuilder: (__, index) {
               return Dismissible(
-                key: ValueKey(_apiResponse.data![index].noteID),
+                key: ValueKey(_apiResponse.data![index].noteId),
                 direction: DismissDirection.startToEnd,
                 background: Container(
                   color: Colors.red,
@@ -73,7 +71,9 @@ class _NoteListState extends State<NoteList> {
                     child: Icon(Icons.delete, color: Colors.white),
                   ),
                 ),
-                onDismissed: (direction) {},
+                onDismissed: (direction) {
+                  NotesService().deleteNote(_apiResponse.data![index].noteId);
+                },
                 confirmDismiss: (direction) async {
                   final result = await showDialog(
                     context: context,
@@ -88,11 +88,11 @@ class _NoteListState extends State<NoteList> {
                       'Last edited on ${formatDateAndTime(_apiResponse.data![index].getDate!)}',
                     ),
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NoteModify(noteID: '1'),
-                        ),
-                      );
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (_) => NoteModify(
+                                  noteId: _apiResponse.data![index].noteId)))
+                          .then((_) => _fetchNotes());
                     },
                   ),
                 ),

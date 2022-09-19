@@ -20,9 +20,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFF191970),
+          secondary: const Color(0xFF191970),
+        ),
       ),
-      home: NoteList(),
+      home: const NoteList(),
     );
   }
 }

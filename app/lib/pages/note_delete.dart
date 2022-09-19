@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NoteDelete extends StatelessWidget {
@@ -5,7 +6,7 @@ class NoteDelete extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return CupertinoAlertDialog(
       title: const Text('Warning'),
       content: const Text('Are you sure you want to delete this note?'),
       actions: <Widget>[
