@@ -5,7 +5,6 @@ import 'package:app/models/note.dart';
 import 'package:app/models/notes.dart';
 import 'package:app/models/note_insert.dart';
 import 'package:app/services/base_api.dart';
-import 'package:http/http.dart' as http;
 
 class NotesService {
   static const api = 'https://tq-notes-api-jkrgrdggbq-el.a.run.app';

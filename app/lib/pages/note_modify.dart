@@ -1,5 +1,4 @@
 import 'package:app/models/note.dart';
-import 'package:app/models/notes.dart';
 import 'package:app/models/note_insert.dart';
 import 'package:app/services/notes_service.dart';
 import 'package:flutter/cupertino.dart';
